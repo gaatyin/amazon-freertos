@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS OTA PAL V1.0.0
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS OTA PAL V1.0.0
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* Amazon FreeRTOS include. */
+/* FreeRTOS include. */
 #include "FreeRTOS.h"
 #include "aws_iot_ota_pal.h"
 #include "aws_iot_ota_agent_internal.h"
@@ -177,6 +177,6 @@ OTA_PAL_ImageState_t prvPAL_GetPlatformImageState( void )
 /*-----------------------------------------------------------*/
 
 /* Provide access to private members for testing. */
-#ifdef AMAZON_FREERTOS_ENABLE_UNIT_TESTS
+#ifdef FREERTOS_ENABLE_UNIT_TESTS
     #include "aws_ota_pal_test_access_define.h"
 #endif

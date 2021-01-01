@@ -21,7 +21,7 @@ else()
 endif()
 
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS Console metadata
+# FreeRTOS Console metadata
 # -------------------------------------------------------------------------------------------------
 afr_set_board_metadata(ID "NuMaker-IoT-M487")
 afr_set_board_metadata(DISPLAY_NAME "NuMaker-IoT-M487")
@@ -47,8 +47,6 @@ afr_mcu_port(compiler)
 target_compile_definitions(
     AFR::compiler::mcu_port
     INTERFACE $<$<COMPILE_LANGUAGE:C>:${compiler_defined_symbols}>
-    -D__MICROLIB
-    -D_REENT_SMALL 
     -DPRODUCT_VERSION=m487 
     -DCONFIG_REPEATER 
     -DSUPPORT_MBEDTLS 
@@ -63,6 +61,12 @@ target_compile_definitions(
     -DM487 
     ${extra_define}
 )
+if(AFR_IS_TESTING)
+    target_compile_definitions(
+        AFR::compiler::mcu_port
+        INTERFACE -DMBEDTLS_USER_CONFIG_FILE=\"mbedtls_user_config.h\"
+    )
+endif()
 target_compile_definitions(
     AFR::compiler::mcu_port
     INTERFACE $<$<COMPILE_LANGUAGE:ASM>:${assembler_defined_symbols}>
@@ -99,7 +103,7 @@ target_link_libraries(
 )
 
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS portable layers
+# FreeRTOS portable layers
 # -------------------------------------------------------------------------------------------------
 # Normally the portable layer for kernel should be vendor's driver code.
 afr_mcu_port(kernel)
@@ -128,7 +132,7 @@ target_include_directories(
         "${AFR_VENDORS_DIR}/nuvoton/sdk/StdDriver/inc"
         "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/crypto/include"
         "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/include"
-        "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/source/portable/Compiler/Keil"
+        "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/portable/Compiler/Keil"
         "${board_dir}/config_files"
         "${board_dir}/application_code/nuvoton_code"
         # Need aws_clientcredential.h
@@ -141,7 +145,7 @@ afr_mcu_port(pkcs11_implementation DEPENDS AFR::pkcs11_mbedtls)
 target_sources(
     AFR::pkcs11_implementation::mcu_port
     INTERFACE
-        "${afr_ports_dir}/pkcs11/iot_pkcs11_pal.c"
+        "${afr_ports_dir}/pkcs11/core_pkcs11_pal.c"
 )
 
 
@@ -152,15 +156,17 @@ if(AFR_ENABLE_ETH)
     target_sources(
         AFR::freertos_plus_tcp::mcu_port
         INTERFACE
-            "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/source/portable/BufferManagement/BufferAllocation_1.c"
-            "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/source/portable/NetworkInterface/M487/m480_eth.c"
-            "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/source/portable/NetworkInterface/M487/NetworkInterface.c"
+            "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/portable/BufferManagement/BufferAllocation_1.c"
+            "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/portable/NetworkInterface/M487/m480_eth.c"
+            "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/portable/NetworkInterface/M487/NetworkInterface.c"
+            # Header file added to the target so that these are available in code downloaded from the FreeRTOS console.
+            "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/portable/NetworkInterface/M487/m480_eth.h"
     )
 
     target_include_directories(
         AFR::freertos_plus_tcp::mcu_port
         INTERFACE
-            "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/source/portable/NetworkInterface/M487"
+            "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/portable/NetworkInterface/M487"
             "${AFR_VENDORS_DIR}/nuvoton/sdk/StdDriver/inc"
     )
 
@@ -207,7 +213,7 @@ endif()
 
 
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS demos and tests
+# FreeRTOS demos and tests
 # -------------------------------------------------------------------------------------------------
 set(CMAKE_EXECUTABLE_SUFFIX ".axf")
 

@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS Shadow V2.1.0
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Shadow V2.2.3
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -471,7 +471,7 @@ typedef struct AwsIotShadowDocumentInfo
              * This only needs to be set if #AWS_IOT_SHADOW_FLAG_WAITABLE is passed to
              * @ref shadow_function_get.
              */
-            void *( *mallocDocument )( size_t );
+            void * ( *mallocDocument )( size_t );
         } get; /**< @brief Valid members for @ref shadow_function_get. */
 
         /* Valid for Shadow update. */

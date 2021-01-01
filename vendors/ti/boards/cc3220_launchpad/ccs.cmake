@@ -26,8 +26,23 @@ set(link_dependent_libs
     "${simplelink_dir}/source/ti/drivers/net/wifi/ccs/rtos/simplelink.a"
 )
 
+# Force the use of response file to avoid "command line too long" error.
+# These are needed to be put in this file as opposed to arm-ti.cmake because
+# in that case the archiver starts to function incorrectly for mbedtls. The
+# archiver starts to interpret the response file as object file and puts it in
+# the archive as opposed to the actual object files written in that response
+# file. The problem arises because for the TI archiver the response file flag is
+# "@" while for the TI linker it is nothing (empty string).
+SET(CMAKE_C_USE_RESPONSE_FILE_FOR_OBJECTS 1)
+SET(CMAKE_CXX_USE_RESPONSE_FILE_FOR_OBJECTS 1)
+
+# Default response file flag is "@". TI's compiler requires it to be
+# space (" "). Note that the empty string does not work.
+set(CMAKE_C_RESPONSE_FILE_LINK_FLAG " ")
+set(CMAKE_CXX_RESPONSE_FILE_LINK_FLAG " ")
+
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS portable layers
+# FreeRTOS portable layers
 # -------------------------------------------------------------------------------------------------
 
 set(compiler_specific_src
@@ -42,7 +57,7 @@ set(compiler_specific_include
 )
 
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS demos and tests
+# FreeRTOS demos and tests
 # -------------------------------------------------------------------------------------------------
 
 set(link_extra_flags 

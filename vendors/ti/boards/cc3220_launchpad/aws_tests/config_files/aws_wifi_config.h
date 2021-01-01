@@ -1,6 +1,6 @@
 /*
-Amazon FreeRTOS
-Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+FreeRTOS
+Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -65,6 +65,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * @brief Max BSSID length
  */
 #define wificonfigMAX_BSSID_LEN               ( 6 )
+
+/**
+ * @brief Max number of WEP keys supported.
+ */
+#define wificonfigMAX_WEPKEYS                  ( 4 )
+
+/**
+ * @brief Max WEP key length
+ */
+#define wificonfigMAX_WEPKEY_LEN              ( 26 )
 
 /**
  * @brief Max passphrase length

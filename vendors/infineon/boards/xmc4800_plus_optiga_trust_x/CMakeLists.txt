@@ -18,7 +18,7 @@ if(NOT ${AFR_TOOLCHAIN} STREQUAL "arm-gcc")
 endif()
 
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS Console metadata
+# FreeRTOS Console metadata
 # -------------------------------------------------------------------------------------------------
 
 afr_set_board_metadata(ID "Infineon-XMC4800-IoT-Connectivity-Kit-With-OPTIGA-Trust-X")
@@ -145,7 +145,7 @@ target_link_libraries(
 )
 
 # -------------------------------------------------------------------------------------------------
-# Kernel and Amazon FreeRTOS portable layers
+# Kernel and FreeRTOS portable layers
 # -------------------------------------------------------------------------------------------------
 
 # Kernel
@@ -187,6 +187,7 @@ set(compiler_includes
 set( board_includes
      "${xmclib_dir}/CMSIS/Include"
      "${xmclib_dir}/drivers/inc"
+     "${AFR_ROOT_DIR}/libraries/logging/include"
      "${xmclib_dir}/third_party/ESP_AT_Lib/src/include"
      "${xmclib_dir}/CMSIS/Infineon/XMC4800_series/Include"
 	 "${xmclib_dir}/DAVE_Generated/XMC4800"
@@ -203,6 +204,7 @@ set(kernel_includes
     "${AFR_KERNEL_DIR}/include"
     "$<IF:${AFR_IS_TESTING},${AFR_TESTS_DIR},${AFR_DEMOS_DIR}>/include"
     "${AFR_3RDPARTY_DIR}/mbedtls/include"
+    "${AFR_3RDPARTY_DIR}/mbedtls_utils"
     "${xmc4800_aws_dir}/config_files"
 )
 
@@ -242,6 +244,11 @@ target_sources(
     INTERFACE
         "${AFR_VENDORS_DIR}/infineon/secure_elements/pkcs11/iot_pkcs11_trustx.c"
 )
+target_link_libraries(
+    AFR::pkcs11_implementation::mcu_port
+    INTERFACE
+        AFR::crypto
+)
 
 # Secure sockets
 afr_mcu_port(secure_sockets)
@@ -259,7 +266,7 @@ target_sources(
 )
 
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS demos and tests
+# FreeRTOS demos and tests
 # -------------------------------------------------------------------------------------------------
 set(CMAKE_EXECUTABLE_SUFFIX ".elf")
 

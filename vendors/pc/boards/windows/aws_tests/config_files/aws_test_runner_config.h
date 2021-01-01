@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS V1.1.4
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS V1.1.4
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@
 #ifndef AWS_TEST_RUNNER_CONFIG_H
 #define AWS_TEST_RUNNER_CONFIG_H
 
-/* Uncomment this line if you want to run AFQP tests only. */
+/* Uncomment this line if you want to run DQP_FR tests only. */
 /* #define testrunnerAFQP_ENABLED */
 
 #define testrunnerUNSUPPORTED                         0
@@ -46,9 +46,14 @@
 #define testrunnerFULL_GGD_HELPER_ENABLED             0
 #define testrunnerFULL_MQTT_AGENT_ENABLED             0
 #define testrunnerFULL_MQTT_ALPN_ENABLED              0
+#define testrunnerFULL_CORE_MQTT_ENABLED              0
+#define testrunnerFULL_CORE_MQTT_AWS_IOT_ENABLED      0
+#define testrunnerFULL_CORE_HTTP_ENABLED              0
+#define testrunnerFULL_CORE_HTTP_AWS_IOT_ENABLED      0
 #define testrunnerFULL_MQTT_STRESS_TEST_ENABLED       0
 #define testrunnerFULL_MQTTv4_ENABLED                 0
 #define testrunnerFULL_PKCS11_ENABLED                 0
+#define testrunnerFULL_PKCS11_MODEL_ENABLED           0
 #define testrunnerFULL_POSIX_ENABLED                  0
 #define testrunnerFULL_SHADOW_ENABLED                 0
 #define testrunnerFULL_SHADOWv4_ENABLED               0
@@ -62,6 +67,7 @@
 #define testrunnerUTIL_PLATFORM_CLOCK_ENABLED         0
 #define testrunnerUTIL_PLATFORM_THREADS_ENABLED       0
 #define testrunnerFULL_HTTPS_CLIENT_ENABLED           0
+#define testrunnerFULL_DEVICE_SHADOW_ENABLED          0
 
 /* On systems using FreeRTOS+TCP (such as this one) the TCP segments must be
  * cleaned up before running the memory leak check. */

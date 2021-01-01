@@ -20,7 +20,7 @@ elseif(NOT AFR_METADATA_MODE)
 endif()
 
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS Console metadata
+# FreeRTOS Console metadata
 # -------------------------------------------------------------------------------------------------
 
 afr_set_board_metadata(ID "NXP-LPC54018-IoT-Module")
@@ -94,7 +94,7 @@ target_include_directories(
 )
 
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS portable layers
+# FreeRTOS portable layers
 # -------------------------------------------------------------------------------------------------
 
 
@@ -206,10 +206,6 @@ target_include_directories(
 
 # POSIX
 
-# TODO: Compile error with mcuxpresso tool chain
-# "time_t" is already defined in the redlib
-if(${AFR_TOOLCHAIN} STREQUAL "arm-iar")
-
 afr_mcu_port(posix)
 
 target_sources(
@@ -227,8 +223,6 @@ target_link_libraries(
     INTERFACE AFR::freertos_plus_posix
 )
 
-endif()
-
 # WiFi
 afr_mcu_port(wifi)
 target_sources(
@@ -241,7 +235,7 @@ afr_mcu_port(pkcs11_implementation)
 target_sources(
     AFR::pkcs11_implementation::mcu_port
     INTERFACE
-        "${lpc54018_ports_dir}/pkcs11/iot_pkcs11_pal.c"
+        "${lpc54018_ports_dir}/pkcs11/core_pkcs11_pal.c"
         "${lpc54018_ports_dir}/pkcs11/hw_poll.c"
 )
 
@@ -268,7 +262,7 @@ target_sources(
 )
 
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS demos and tests
+# FreeRTOS demos and tests
 # -------------------------------------------------------------------------------------------------
 set(CMAKE_EXECUTABLE_SUFFIX ${executable_suffix})
 

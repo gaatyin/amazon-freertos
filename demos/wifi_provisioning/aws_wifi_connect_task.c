@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS V201912.00
- * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS V202012.00
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -36,8 +36,13 @@
 #include "aws_demo_config.h"
 #include "aws_wifi_connect_task.h"
 #include "iot_network_manager_private.h"
-#include "iot_ble_wifi_provisioning.h"
 
+#if IOT_WIFI_ENABLE_SOFTAP_PROVISIONING == 1
+    #include "iot_softap_wifi_provisioning.h"
+#endif
+#if IOT_BLE_ENABLE_WIFI_PROVISIONING == 1
+    #include "iot_ble_wifi_provisioning.h"
+#endif
 
 #define wifiConnectTASK_NAME        "WiFiConnectTask"
 
@@ -45,7 +50,6 @@
  * @brief Delay in milliseconds between connecting to the provisioned WiFi networks.
  */
 #define wifiConnectDELAY_SECONDS    ( 1 )
-
 
 
 /**
@@ -94,15 +98,25 @@ void prvWiFiConnectTask( void * pvParams )
 
             while( xWiFiConnected == pdFALSE )
             {
-                ulNumNetworks = IotBleWifiProv_GetNumNetworks();
+                ulNumNetworks = 0;
+                #if IOT_WIFI_ENABLE_SOFTAP_PROVISIONING == 1
+                    ulNumNetworks += IotWifiSoftAPProv_GetNumNetworks();
+                #endif
+                #if IOT_BLE_ENABLE_WIFI_PROVISIONING == 1
+                    ulNumNetworks += IotBleWifiProv_GetNumNetworks();
+                #endif
 
                 if( ulNumNetworks > 0 )
                 {
                     for( ulNetworkIndex = 0; ulNetworkIndex < ulNumNetworks; ulNetworkIndex++ )
                     {
-                        if( WIFI_IsConnected() == pdFALSE )
+                        if( WIFI_IsConnected( NULL ) == pdFALSE )
                         {
-                            xWiFiConnected = IotBleWifiProv_Connect( ulNetworkIndex );
+                            #if IOT_WIFI_ENABLE_SOFTAP_PROVISIONING == 1
+                                xWiFiConnected = IotWifiSoftAPProv_Connect( ulNetworkIndex );
+                            #else
+                                xWiFiConnected = IotBleWifiProv_Connect( ulNetworkIndex );
+                            #endif
                         }
                         else
                         {

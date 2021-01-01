@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS Defender V3.0.0
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Defender V3.0.3
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -463,7 +463,6 @@ static void _metricsPublishRoutine( IotTaskPool_t pTaskPool,
 
     IotMqttError_t mqttError = IOT_MQTT_SUCCESS;
     bool reportCreated = false;
-    IotTaskPoolError_t taskPoolError = IOT_TASKPOOL_SUCCESS;
 
     if( !IotSemaphore_TryWait( &_doneSem ) )
     {
@@ -509,7 +508,7 @@ static void _metricsPublishRoutine( IotTaskPool_t pTaskPool,
         else
         {
             /* Re-schedule metrics job with period as deferred interval. */
-            taskPoolError = IotTaskPool_ScheduleDeferred( IOT_SYSTEM_TASKPOOL, _metricsPublishJob, _periodMilliSecond );
+            ( void ) IotTaskPool_ScheduleDeferred( IOT_SYSTEM_TASKPOOL, _metricsPublishJob, _periodMilliSecond );
         }
 
         /* Give Done semaphore so AwsIotDefender_Stop() can proceed */

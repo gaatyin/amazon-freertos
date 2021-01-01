@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS HTTPS Client V1.1.1
- * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS HTTPS Client V1.2.0
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -55,7 +55,7 @@
  * This address MUST NOT start with http:// or https://.
  */
 #ifndef IOT_TEST_HTTPS_SERVER_HOST_NAME
-    #define IOT_TEST_HTTPS_SERVER_HOST_NAME    "httpbin.org"
+    #define IOT_TEST_HTTPS_SERVER_HOST_NAME    "postman-echo.com"
 #endif
 
 /**
@@ -240,7 +240,6 @@ static IotHttpsConnectionInfo_t _connInfo =
     .pAddress             = IOT_TEST_HTTPS_SERVER_HOST_NAME,
     .addressLen           = sizeof( IOT_TEST_HTTPS_SERVER_HOST_NAME ) - 1,
     .port                 = IOT_TEST_HTTPS_PORT,
-    .flags                = 0,
     .userBuffer.pBuffer   = _pConnUserBuffer,
     .userBuffer.bufferLen = sizeof( _pConnUserBuffer ),
     #if IOT_TEST_SECURED_CONNECTION == 1
@@ -252,7 +251,10 @@ static IotHttpsConnectionInfo_t _connInfo =
         .privateKeyLen    = sizeof( IOT_TEST_HTTPS_CLIENT_PRIVATE_KEY ),
         .pAlpnProtocols   = IOT_TEST_HTTPS_ALPN_PROTOCOLS,
         .alpnProtocolsLen = sizeof( IOT_TEST_HTTPS_ALPN_PROTOCOLS ),
-    #endif
+        .flags            = 0,
+    #else
+        .flags            = IOT_HTTPS_IS_NON_TLS_FLAG,
+    #endif /* if IOT_TEST_SECURED_CONNECTION == 1 */
     .pNetworkInterface    = NULL /* This will be set during TEST_SETUP(). */
 };
 
@@ -266,6 +268,9 @@ static void _readReadyCallback( void * pPrivData,
                                 IotHttpsReturnCode_t rc,
                                 uint16_t status )
 {
+    /* Disable unused parameter warning. */
+    ( void ) rc;
+
     IotHttpsReturnCode_t returnCode;
     uint32_t bodyLen = HTTPS_TEST_RESP_BODY_BUFFER_SIZE;
     _asyncVerificationParams_t * verifParams = ( _asyncVerificationParams_t * ) pPrivData;
@@ -291,6 +296,11 @@ static void _responseCompleteCallback( void * pPrivData,
                                        IotHttpsReturnCode_t rc,
                                        uint16_t status )
 {
+    /* Disable unused parameter warning. */
+    ( void ) respHandle;
+    ( void ) rc;
+    ( void ) status;
+
     _asyncVerificationParams_t * verifParams = ( _asyncVerificationParams_t * ) pPrivData;
 
     IotSemaphore_Post( &( verifParams->finishedSem ) );

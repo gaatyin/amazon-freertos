@@ -18,7 +18,8 @@ Functions : hardware entropy collector(repeatedly called until enough gathered)
 int mbedtls_hardware_poll( void *data,
                            unsigned char *output, size_t len, size_t *olen )
 {
-    R_INTERNAL_NOT_USED(data);
+    INTERNAL_NOT_USED(data);
+	INTERNAL_NOT_USED(len);
 
     uint32_t random_number = 0;
     size_t num_bytes = ( len < sizeof( uint32_t ) ) ? len : sizeof( uint32_t );
@@ -37,7 +38,7 @@ Functions : random number generator(XorShift method)
 
 WARNING: For best security practice, it is recommended to utilize a
     random number generation solution that is truly randomized and conforms to
-    the guidelines provided in the Amazon FreeRTOS Qualification Guide
+    the guidelines provided in the Device Qualification Program for FreeRTOS Guide
     (https://docs.aws.amazon.com/freertos/latest/qualificationguide/afq-checklist.html).
     The random number generator method presented in this file by the silicon vendor
     is not truly random in nature. The current solution takes entropy from the

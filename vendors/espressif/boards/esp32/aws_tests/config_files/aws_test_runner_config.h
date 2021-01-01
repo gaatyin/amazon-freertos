@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS V1.1.4
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS V1.1.4
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -26,42 +26,49 @@
 #ifndef AWS_TEST_RUNNER_CONFIG_H
 #define AWS_TEST_RUNNER_CONFIG_H
 
-/* Uncomment this line if you want to run AFQP tests only. */
+/* Uncomment this line if you want to run DQP_FR tests only. */
 /* #define testrunnerAFQP_ENABLED */
 
-#define testrunnerUNSUPPORTED                       0
+#define testrunnerUNSUPPORTED                          0
 
 /* Unsupported tests */
-#define testrunnerFULL_OTA_CBOR_ENABLED               testrunnerUNSUPPORTED
-#define testrunnerFULL_POSIX_ENABLED                  testrunnerUNSUPPORTED
+#define testrunnerFULL_OTA_CBOR_ENABLED                testrunnerUNSUPPORTED
+#define testrunnerFULL_POSIX_ENABLED                   testrunnerUNSUPPORTED
 
 /* Enable tests by setting defines to 1 */
-#define testrunnerFULL_OTA_AGENT_ENABLED            0
-#define testrunnerFULL_OTA_PAL_ENABLED              0
-#define testrunnerFULL_MQTT_ALPN_ENABLED            0
-#define testrunnerFULL_PKCS11_ENABLED               0
-#define testrunnerFULL_CRYPTO_ENABLED               0
-#define testrunnerFULL_MQTT_STRESS_TEST_ENABLED     0
-#define testrunnerFULL_MQTT_AGENT_ENABLED           0
-#define testrunnerFULL_TCP_ENABLED                  1
-#define testrunnerFULL_GGD_ENABLED                  0
-#define testrunnerFULL_GGD_HELPER_ENABLED           0
-#define testrunnerFULL_SHADOW_ENABLED               0
-#define testrunnerFULL_SHADOWv4_ENABLED             0
-#define testrunnerFULL_MQTTv4_ENABLED               0
-#define testrunnerFULL_WIFI_ENABLED                 0
-#define testrunnerFULL_MEMORYLEAK_ENABLED           0
-#define testrunnerFULL_TLS_ENABLED                  0
-#define testrunnerFULL_BLE_END_TO_END_TEST_ENABLED  0
-#define testrunnerFULL_BLE_ENABLED                  0
-#define testrunnerFULL_BLE_STRESS_TEST_ENABLED      0
-#define testrunnerFULL_BLE_KPI_TEST_ENABLED         0
-#define testrunnerFULL_BLE_INTEGRATION_TEST_ENABLED 0
-#define testrunnerFULL_WIFI_PROVISIONING_ENABLED    0
-#define testrunnerUTIL_PLATFORM_CLOCK_ENABLED       0
-#define testrunnerFULL_LINEAR_CONTAINERS_ENABLED    0
-#define testrunnerUTIL_PLATFORM_THREADS_ENABLED     0
-#define testrunnerFULL_SERIALIZER_ENABLED           0
-#define testrunnerFULL_HTTPS_CLIENT_ENABLED         0
-
+#define testrunnerFULL_OTA_AGENT_ENABLED               0
+#define testrunnerFULL_OTA_PAL_ENABLED                 0
+#define testrunnerFULL_MQTT_ALPN_ENABLED               0
+#define testrunnerFULL_CORE_MQTT_ENABLED               0
+#define testrunnerFULL_CORE_HTTP_ENABLED               0
+#define testrunnerFULL_CORE_HTTP_AWS_IOT_ENABLED       0
+#define testrunnerFULL_CORE_MQTT_AWS_IOT_ENABLED       0
+#define testrunnerFULL_DEVICE_SHADOW_ENABLED           0
+#define testrunnerFULL_PKCS11_ENABLED                  0
+#define testrunnerFULL_DEFENDER_ENABLED                0
+#define testrunnerFULL_CRYPTO_ENABLED                  0
+#define testrunnerFULL_MQTT_STRESS_TEST_ENABLED        0
+#define testrunnerFULL_MQTT_AGENT_ENABLED              0
+#define testrunnerFULL_TCP_ENABLED                     1
+#define testrunnerFULL_GGD_ENABLED                     0
+#define testrunnerFULL_GGD_HELPER_ENABLED              0
+#define testrunnerFULL_SHADOW_ENABLED                  0
+#define testrunnerFULL_SHADOWv4_ENABLED                0
+#define testrunnerFULL_MQTTv4_ENABLED                  0
+#define testrunnerFULL_WIFI_ENABLED                    0
+#define testrunnerFULL_MEMORYLEAK_ENABLED              0
+#define testrunnerFULL_TLS_ENABLED                     0
+#define testrunnerFULL_BLE_END_TO_END_TEST_ENABLED     0
+#define testrunnerFULL_BLE_ENABLED                     0
+#define testrunnerFULL_BLE_STRESS_TEST_ENABLED         0
+#define testrunnerFULL_BLE_KPI_TEST_ENABLED            0
+#define testrunnerFULL_BLE_INTEGRATION_TEST_ENABLED    0
+#define testrunnerFULL_WIFI_PROVISIONING_ENABLED       0
+#define testrunnerUTIL_PLATFORM_CLOCK_ENABLED          0
+#define testrunnerFULL_LINEAR_CONTAINERS_ENABLED       0
+#define testrunnerUTIL_PLATFORM_THREADS_ENABLED        0
+#define testrunnerFULL_SERIALIZER_ENABLED              0
+#define testrunnerFULL_HTTPS_CLIENT_ENABLED            0
+#define testrunnerFULL_COMMON_IO_ENABLED               0
+#define testrunnerFULL_CLI_ENABLED                     0
 #endif /* AWS_TEST_RUNNER_CONFIG_H */

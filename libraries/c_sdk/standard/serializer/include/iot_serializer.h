@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS Serializer V1.1.0
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Serializer V1.1.2
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -151,6 +151,8 @@
 #define IOT_SERIALIZER_DECODER_OBJECT_INITIALIZER              { .type = IOT_SERIALIZER_UNDEFINED }
 
 #define IOT_SERIALIZER_DECODER_ITERATOR_INITIALIZER            NULL
+
+#define IOT_SERIALIZER_SCALAR_DATA_INITIALIZER                 { .type = IOT_SERIALIZER_UNDEFINED }
 
 /* helper macro to create scalar data */
 #define IotSerializer_ScalarSignedInt( signedIntValue )                                                                        \

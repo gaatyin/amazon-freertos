@@ -7,11 +7,12 @@
 # please read the ESP-IDF documents if you need to do this.
 
 AMAZON_FREERTOS_SDK_DIR := ../../../../../../../../libraries/c_sdk
+AMAZON_FREERTOS_SDK_V4_DIR := ../../../../../../../../libraries/c_sdk_v4
 AMAZON_FREERTOS_3RD_PARTY_DIR := ../../../../../../../../libraries/3rdparty
 AMAZON_FREERTOS_ABSTRACTIONS_DIR := ../../../../../../../../libraries/abstractions
 AMAZON_FREERTOS_ARF_PLUS_DIR := ../../../../../../../../libraries/freertos_plus
 AMAZON_FREERTOS_ARF_KERNEL := ../../../../../../../../freertos_kernel
-AMAZON_FREERTOS_ARF_PORTS := ../../../../../../../../vendors/espressif/boards/esp32/ports
+AMAZON_FREERTOS_ARF_PORTS := ../../../../../../../../vendors/espressif/boards/ports
 AMAZON_FREERTOS_TESTS_DIR := ../../../../../../../../tests
 AMAZON_FREERTOS_DEMOS_DIR := ../../../../../../../../demos
 
@@ -22,7 +23,7 @@ AMAZON_FREERTOS_ESP32 := ../../../../../../../../vendors/espressif/boards/esp32/
 endif
 
 #--------------------------------------------------------------------------------------
-# Amazon FreeRTOS Libraries
+# FreeRTOS Libraries
 #--------------------------------------------------------------------------------------
 COMPONENT_SRCDIRS := $(AMAZON_FREERTOS_SDK_DIR)/standard/mqtt/src \
         $(AMAZON_FREERTOS_SDK_DIR)/standard/src \
@@ -39,6 +40,7 @@ COMPONENT_SRCDIRS := $(AMAZON_FREERTOS_SDK_DIR)/standard/mqtt/src \
         $(AMAZON_FREERTOS_SDK_DIR)/standard/serializer/src/json \
         $(AMAZON_FREERTOS_SDK_DIR)/aws/defender/src \
         $(AMAZON_FREERTOS_SDK_DIR)/aws/shadow/src \
+        $(AMAZON_FREERTOS_SDK_V4_DIR)/standard/coreMQTT/source \
         $(AMAZON_FREERTOS_ARF_PLUS_DIR)/aws/greengrass/src \
         $(AMAZON_FREERTOS_ARF_PLUS_DIR)/aws/ota/src \
         $(AMAZON_FREERTOS_ARF_PLUS_DIR)/aws/ota/src/mqtt \
@@ -52,7 +54,7 @@ COMPONENT_SRCDIRS := $(AMAZON_FREERTOS_SDK_DIR)/standard/mqtt/src \
         $(AMAZON_FREERTOS_ABSTRACTIONS_DIR)/platform/freertos \
         $(AMAZON_FREERTOS_3RD_PARTY_DIR)/http_parser \
         $(AMAZON_FREERTOS_3RD_PARTY_DIR)/jsmn \
-        $(AMAZON_FREERTOS_3RD_PARTY_DIR)/tinycbor \
+        $(AMAZON_FREERTOS_3RD_PARTY_DIR)/tinycbor/src \
         $(AMAZON_FREERTOS_3RD_PARTY_DIR)/pkcs11 \
         $(AMAZON_FREERTOS_ARF_PORTS)/ble \
         $(AMAZON_FREERTOS_ARF_PORTS)/ota \
@@ -63,9 +65,11 @@ COMPONENT_ADD_INCLUDEDIRS := $(AMAZON_FREERTOS_ARF_PLUS_DIR)/standard/freertos_p
                              ${AMAZON_FREERTOS_ABSTRACTIONS_DIR}/posix/include \
                              $(AMAZON_FREERTOS_SDK_DIR)/standard/ble/include \
                              $(AMAZON_FREERTOS_SDK_DIR)/standard/https/include \
+                             $(AMAZON_FREERTOS_SDK_V4_DIR)/standard/coreMQTT/source/include \
                              $(AMAZON_FREERTOS_3RD_PARTY_DIR)/http_parser \
+                             $(AMAZON_FREERTOS_3RD_PARTY_DIR)/mbedtls_utils \
                              $(AMAZON_FREERTOS_3RD_PARTY_DIR)/jsmn \
-                             $(AMAZON_FREERTOS_3RD_PARTY_DIR)/tinycbor \
+                             $(AMAZON_FREERTOS_3RD_PARTY_DIR)/tinycbor/src \
                              $(AMAZON_FREERTOS_ABSTRACTIONS_DIR)/platform/freertos/include \
                              $(AMAZON_FREERTOS_ABSTRACTIONS_DIR)/platform/include \
                              $(AMAZON_FREERTOS_3RD_PARTY_DIR)/pkcs11 \
@@ -92,6 +96,7 @@ COMPONENT_PRIV_INCLUDEDIRS := $(AMAZON_FREERTOS_ABSTRACTIONS_DIR)/pkcs11 \
 lib/greengrass/aws_greengrass_discovery.o: CFLAGS+=-Wno-format
 lib/common/aws_logging_task_dynamic_buffers.o: CFLAGS+=-Wno-format -Wno-uninitialized
 libraries/c_sdk/aws/defender/src/aws_iot_defender_api.o: CFLAGS+=-Wno-unused-but-set-variable
+vendors/espressif/boards/ports/ble/iot_ble_hal_gatt_server.o: CFLAGS+=-Wno-stringop-overflow
 
 ifdef AMAZON_FREERTOS_ENABLE_UNIT_TEST
 COMPONENT_SRCDIRS += ../.. \
@@ -171,6 +176,6 @@ COMPONENT_ADD_INCLUDEDIRS += $(AMAZON_FREERTOS_DEMOS_DIR)/include \
 demos/common/tcp/aws_tcp_echo_client_single_task.o: CFLAGS+=-Wno-format
 endif
 
-ifdef AFR_ESP_LWIP
+ifndef AFR_ESP_FREERTOS_TCP
 COMPONENT_OBJEXCLUDE += $(AMAZON_FREERTOS_DEMOS_DIR)/demo_runner/aws_demo_network_addr.o
 endif

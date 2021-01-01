@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS HTTPS Client V1.1.1
- * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS HTTPS Client V1.2.0
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -28,6 +28,7 @@
  * @brief Tests for the user-facing API functions declared in iot_https_client.h.
  */
 
+#include <string.h>
 #include "iot_tests_https_common.h"
 
 /*-----------------------------------------------------------*/
@@ -798,7 +799,7 @@ TEST( HTTPS_Client_Unit_API, AddHeaderInvalidParameters )
     TEST_ASSERT_EQUAL( IOT_HTTPS_INVALID_PARAMETER, returnCode );
     returnCode = IotHttpsClient_AddHeader( reqHandle, HTTPS_HOST_HEADER, FAST_MACRO_STRLEN( HTTPS_HOST_HEADER ), HTTPS_TEST_ADDRESS, FAST_MACRO_STRLEN( HTTPS_TEST_ADDRESS ) );
     TEST_ASSERT_EQUAL( IOT_HTTPS_INVALID_PARAMETER, returnCode );
-    returnCode = IotHttpsClient_AddHeader( reqHandle, HTTPS_CONTENT_LENGTH_HEADER, FAST_MACRO_STRLEN( HTTPS_CONTENT_LENGTH_HEADER ), pTestContentLengthValueStr, FAST_MACRO_STRLEN( pTestContentLengthValueStr ) );
+    returnCode = IotHttpsClient_AddHeader( reqHandle, HTTPS_CONTENT_LENGTH_HEADER, FAST_MACRO_STRLEN( HTTPS_CONTENT_LENGTH_HEADER ), pTestContentLengthValueStr, strlen( pTestContentLengthValueStr ) );
     TEST_ASSERT_EQUAL( IOT_HTTPS_INVALID_PARAMETER, returnCode );
     returnCode = IotHttpsClient_AddHeader( reqHandle, HTTPS_CONNECTION_HEADER, FAST_MACRO_STRLEN( HTTPS_CONNECTION_HEADER ), HTTPS_CONNECTION_KEEP_ALIVE_HEADER_VALUE, FAST_MACRO_STRLEN( HTTPS_CONNECTION_KEEP_ALIVE_HEADER_VALUE ) );
     TEST_ASSERT_EQUAL( IOT_HTTPS_INVALID_PARAMETER, returnCode );
@@ -849,7 +850,7 @@ TEST( HTTPS_Client_Unit_API, AddHeaderMultipleHeaders )
     IotHttpsReturnCode_t returnCode = IOT_HTTPS_OK;
     IotHttpsRequestHandle_t reqHandle = IOT_HTTPS_REQUEST_HANDLE_INITIALIZER;
 
-    /* Intead of iterating in a loop, all the dummy headers are declared immediately because in the unit testing
+    /* Instead of iterating in a loop, all the dummy headers are declared immediately because in the unit testing
      * infrastructure and workflow the number of repetitions is typically not changed from the original.  */
     char * pHeader0 = "header0";
     char * pHeader1 = "header1";

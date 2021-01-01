@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS Greengrass V2.0.0
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Greengrass V2.0.2
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -928,6 +928,6 @@ static BaseType_t prvCheckForContentLengthString( uint8_t * pucIndex,
 }
 /*-----------------------------------------------------------*/
 /* Provide access to private members for testing. */
-#ifdef AMAZON_FREERTOS_ENABLE_UNIT_TESTS
+#ifdef FREERTOS_ENABLE_UNIT_TESTS
     #include "aws_greengrass_discovery_test_access_define.h"
 #endif

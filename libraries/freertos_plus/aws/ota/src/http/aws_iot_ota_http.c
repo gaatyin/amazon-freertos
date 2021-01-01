@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS OTA V1.1.0
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS OTA V1.2.1
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -180,7 +180,8 @@ typedef enum
 
 typedef enum
 {
-    OTA_HTTP_IDLE = 0,
+    OTA_HTTP_STOPPED = 0,
+    OTA_HTTP_IDLE,
     OTA_HTTP_SENDING_REQUEST,
     OTA_HTTP_WAITING_RESPONSE,
     OTA_HTTP_PROCESSING_RESPONSE
@@ -287,7 +288,7 @@ static void _httpFreeBuffers()
 /* Process the HTTP response body, copy to another buffer and signal OTA agent the file block
  * download is complete. */
 static void _httpProcessResponseBody( OTA_AgentContext_t * pAgentCtx,
-                                      uint8_t * pResponseBodyBuffer,
+                                      uint8_t * pHTTPResponseBody,
                                       uint32_t bufferSize )
 {
     IotLogDebug( "Invoking _httpProcessResponseBody" );
@@ -309,7 +310,7 @@ static void _httpProcessResponseBody( OTA_AgentContext_t * pAgentCtx,
     {
         pMessage->ulDataLength = bufferSize;
 
-        memcpy( pMessage->ucData, pResponseBodyBuffer, pMessage->ulDataLength );
+        memcpy( pMessage->ucData, pHTTPResponseBody, pMessage->ulDataLength );
         eventMsg.xEventId = eOTA_AgentEvent_ReceivedFileBlock;
         eventMsg.pxEventData = pMessage;
         /* Send job document received event. */
@@ -336,8 +337,8 @@ static void _httpErrorHandler( uint16_t responseCode )
     }
 
     IotLogInfo( "HTTP message body:" );
-    vLoggingPrint( pResponseBody );
-    vLoggingPrint( "\n" );
+    vLoggingPrintf( pResponseBody );
+    vLoggingPrintf( "\n" );
 
     if( responseCode == IOT_HTTPS_STATUS_FORBIDDEN )
     {
@@ -385,6 +386,13 @@ static void _httpAppendHeaderCallback( void * pPrivateData,
                                        IotHttpsRequestHandle_t requestHandle )
 {
     IotLogDebug( "Invoking _httpAppendHeaderCallback." );
+
+    /* Cancel the request if the HTTP downloader is stopped by the OTA agent. */
+    if( _httpDownloader.state == OTA_HTTP_STOPPED )
+    {
+        IotHttpsClient_CancelRequestAsync( requestHandle );
+        return;
+    }
 
     /* Value of the "Range" field in HTTP GET request header, set when requesting the file block. */
     char * pRangeValueStr = ( ( _httpCallbackData_t * ) ( pPrivateData ) )->pRangeValueStr;
@@ -434,6 +442,13 @@ static void _httpReadReadyCallback( void * pPrivateData,
 
     /* Buffer to read the "Connection" field in HTTP header. */
     char connectionValueStr[ HTTP_HEADER_CONNECTION_VALUE_MAX_LEN ] = { 0 };
+
+    /* Bail out if this callback is invoked after http downloader stopped. */
+    if( _httpDownloader.state == OTA_HTTP_STOPPED )
+    {
+        IotHttpsClient_CancelResponseAsync( responseHandle );
+        return;
+    }
 
     /* A response is received from the server, setting the state to processing response. */
     _httpDownloader.state = OTA_HTTP_PROCESSING_RESPONSE;
@@ -499,8 +514,8 @@ static void _httpReadReadyCallback( void * pPrivateData,
         /* Check if the server returns a response with connection field set to "close". */
         if( strncmp( "close", connectionValueStr, sizeof( "close" ) ) == 0 )
         {
-            IotLogInfo( "Connection has been closed by the HTTP server, reconnecting to the server..." );
-            _httpReconnect();
+            IotLogInfo( "Connection has been closed by the HTTP server, reconnect in next request." );
+            _httpDownloader.err = OTA_HTTP_ERR_NEED_RECONNECT;
         }
     }
 
@@ -532,8 +547,8 @@ static void _httpResponseCompleteCallback( void * pPrivateData,
     /* OTA Event. */
     OTA_EventMsg_t eventMsg = { 0 };
 
-    /* Bail out if this callback is invoked after the OTA agent is stopped. */
-    if( _httpDownloader.pAgentCtx->eState == eOTA_AgentState_Stopped )
+    /* Bail out if this callback is invoked after http downloader stopped. */
+    if( _httpDownloader.state == OTA_HTTP_STOPPED )
     {
         return;
     }
@@ -608,8 +623,8 @@ static void _httpConnectionClosedCallback( void * pPrivateData,
     ( void ) connectionHandle;
     ( void ) returnCode;
 
-    IotLogInfo( "Connection has been closed by the HTTP client due to an error, reconnecting to the server..." );
-    _httpReconnect();
+    IotLogInfo( "Connection has been closed by the HTTP server, reconnect in next request." );
+    _httpDownloader.err = OTA_HTTP_ERR_NEED_RECONNECT;
 }
 
 static IotHttpsReturnCode_t _httpInitUrl( const char * pURL )
@@ -652,7 +667,7 @@ static IotHttpsReturnCode_t _httpInitUrl( const char * pURL )
 }
 
 static IotHttpsReturnCode_t _httpConnect( const IotNetworkInterface_t * pNetworkInterface,
-                                          IotNetworkCredentials_t * pNetworkCredentials )
+                                          struct IotNetworkCredentials * pNetworkCredentials )
 {
     /* HTTP API return status. */
     IotHttpsReturnCode_t httpsStatus = IOT_HTTPS_OK;
@@ -926,7 +941,7 @@ OTA_Err_t _AwsIotOTA_InitFileTransfer_HTTP( OTA_AgentContext_t * pAgentCtx )
     /* Network interface and credentials from OTA agent. */
     OTA_ConnectionContext_t * connContext = pAgentCtx->pvConnectionContext;
     const IotNetworkInterface_t * pNetworkInterface = connContext->pxNetworkInterface;
-    IotNetworkCredentials_t * pNetworkCredentials = connContext->pvNetworkCredentials;
+    struct IotNetworkCredentials * pNetworkCredentials = connContext->pvNetworkCredentials;
 
     /* Pre-signed URL. */
     const char * pURL = NULL;
@@ -940,8 +955,9 @@ OTA_Err_t _AwsIotOTA_InitFileTransfer_HTTP( OTA_AgentContext_t * pAgentCtx )
     /* OTA download file size from the HTTP server, this should match otaFileSize. */
     uint32_t httpFileSize = 0;
 
-    /* Store the OTA agent for later access. */
+    /* Store the OTA agent for later use and set state to idle. */
     _httpDownloader.pAgentCtx = pAgentCtx;
+    _httpDownloader.state = OTA_HTTP_IDLE;
 
     if( fileContext == NULL )
     {
@@ -1170,16 +1186,36 @@ OTA_Err_t _AwsIotOTA_DecodeFileBlock_HTTP( uint8_t * pMessageBuffer,
 }
 
 
-OTA_Err_t _AwsIotOTA_Cleanup_HTTP( OTA_AgentContext_t * pAgentCtx )
+OTA_Err_t _AwsIotOTA_CleanupData_HTTP( OTA_AgentContext_t * pAgentCtx )
 {
-    IotLogDebug( "Invoking _AwsIotOTA_Cleanup_HTTP" );
+    IotLogDebug( "Invoking _AwsIotOTA_CleanupData_HTTP" );
 
     /* Unused parameters. */
     ( void ) pAgentCtx;
 
-    memset( &_httpDownloader, 0, sizeof( _httpDownloader_t ) );
+    /* Return status. */
+    IotHttpsReturnCode_t httpsStatus = IOT_HTTPS_OK;
 
-    _httpFreeBuffers();
+    /* Disconnect from the S3 server. */
+    httpsStatus = IotHttpsClient_Disconnect( _httpDownloader.httpConnection.connectionHandle );
+
+    if( IOT_HTTPS_OK != httpsStatus )
+    {
+        IotLogDebug( "Failed to disconnect from S3 server. Error code: %d.", httpsStatus );
+    }
+
+    _httpDownloader.httpConnection.connectionHandle = NULL;
+
+    /* Reset downloader state and progress tracker. */
+    _httpDownloader.state = OTA_HTTP_STOPPED;
+    _httpDownloader.err = OTA_HTTP_ERR_NONE;
+    _httpDownloader.currBlock = 0;
+    _httpDownloader.currBlockSize = 0;
+
+    if( _httpDownloader.pAgentCtx->eState == eOTA_AgentState_ShuttingDown )
+    {
+        _httpFreeBuffers();
+    }
 
     return kOTA_Err_None;
 }

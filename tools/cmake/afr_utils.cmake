@@ -3,7 +3,7 @@
 # -------------------------------------------------------------------------------------------------
 # Set AFR source root.
 get_filename_component(__root_dir "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
-set(AFR_ROOT_DIR ${__root_dir} CACHE INTERNAL "Amazon FreeRTOS source root.")
+set(AFR_ROOT_DIR ${__root_dir} CACHE INTERNAL "FreeRTOS source root.")
 
 # Get all supported vendors.
 function(afr_get_vendors arg_vendors)
@@ -22,7 +22,9 @@ endfunction()
 # Get all supported boards from a vendor.
 function(afr_get_vendor_boards arg_vendor arg_boards)
     set(vendors_dir "${AFR_ROOT_DIR}/vendors")
-    include("${vendors_dir}/${arg_vendor}/manifest.cmake")
+    if(EXISTS "${vendors_dir}/${arg_vendor}/manifest.cmake")
+        include("${vendors_dir}/${arg_vendor}/manifest.cmake")
+    endif()
 
     set(${arg_boards} "${AFR_MANIFEST_SUPPORTED_BOARDS}" PARENT_SCOPE)
 endfunction()

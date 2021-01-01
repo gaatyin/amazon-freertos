@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS Shadow V2.1.0
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Shadow V2.2.3
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -260,7 +260,7 @@ static AwsIotShadowError_t _validateDocumentInfo( _shadowOperationType_t type,
     {
         if( pDocumentInfo->qos != IOT_MQTT_QOS_1 )
         {
-            IotLogError( "QoS for Shadow %d must be 0 or 1.",
+            IotLogError( "QoS for Shadow %s must be 0 or 1.",
                          _pAwsIotShadowOperationNames[ type ] );
 
             return AWS_IOT_SHADOW_BAD_PARAMETER;

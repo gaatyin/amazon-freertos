@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS Secure Sockets for NXP54018_IoT_Module V1.0.0 Beta 4
- * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Secure Sockets for NXP54018_IoT_Module V1.0.0 Beta 4
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -263,7 +263,7 @@ int32_t SOCKETS_Connect( Socket_t xSocket,
     TLSParams_t xTLSParams = { 0 };
     SOCKADDR_T xTempAddress = { 0 };
 
-    if( ( SOCKETS_INVALID_CONTEXT != pxContext ) && ( NULL != pxAddress ) && WIFI_IsConnected())
+    if( ( SOCKETS_INVALID_CONTEXT != pxContext ) && ( NULL != pxAddress ) && WIFI_IsConnected( NULL ))
     {
         /* Connect the wrapped socket. */
 

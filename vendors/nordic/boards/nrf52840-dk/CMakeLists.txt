@@ -11,7 +11,7 @@ endif()
 
 
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS disabled libraries
+# FreeRTOS disabled libraries
 # -------------------------------------------------------------------------------------------------
 set(AFR_MODULE_defender 0 CACHE INTERNAL "")
 # HTTPS is not supported for Nordic as this board does not have WiFi/Ethernet.
@@ -19,7 +19,7 @@ set(AFR_MODULE_https 0 CACHE INTERNAL "")
 
 
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS Console metadata
+# FreeRTOS Console metadata
 # -------------------------------------------------------------------------------------------------
 
 afr_set_board_metadata(ID "nrf52840-dk")
@@ -99,6 +99,7 @@ set(c_flags
     "-mtp=soft"
     "-munaligned-access"
     "-nostdinc"
+    "-w"
     "-quiet"
     "-gdwarf-4"
     "-g3"
@@ -172,18 +173,18 @@ target_link_libraries(
 
 
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS portable layers
+# FreeRTOS portable layers
 # -------------------------------------------------------------------------------------------------
 # Kernel
 afr_mcu_port(kernel)
 
 set(
     compiler_src
-    "${AFR_KERNEL_DIR}/portable/ThirdParty/GCC/nrf52840-dk/port.c"
-    "${AFR_KERNEL_DIR}/portable/ThirdParty/GCC/nrf52840-dk/port_cmsis.c"
-    "${AFR_KERNEL_DIR}/portable/ThirdParty/GCC/nrf52840-dk/port_cmsis_systick.c"
-    "${AFR_KERNEL_DIR}/portable/ThirdParty/GCC/nrf52840-dk/portmacro.h"
-    "${AFR_KERNEL_DIR}/portable/ThirdParty/GCC/nrf52840-dk/portmacro_cmsis.h"
+    "${nrf5_sdk}/external/freertos/portable/GCC/nrf52/port.c"
+    "${nrf5_sdk}/external/freertos/portable/GCC/nrf52/portmacro.h"
+    "${nrf5_sdk}/external/freertos/portable/CMSIS/nrf52/port_cmsis.c"
+    "${nrf5_sdk}/external/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c"
+    "${nrf5_sdk}/external/freertos/portable/CMSIS/nrf52/portmacro_cmsis.h"
     "${AFR_KERNEL_DIR}/portable/MemMang/heap_4.c"
  )
 
@@ -370,11 +371,12 @@ target_sources(
 )
 set(
     kernel_inc_dirs
-    "${AFR_KERNEL_DIR}/portable/ThirdParty/GCC/nrf52840-dk"
+    "${nrf5_sdk}/external/freertos/portable/GCC/nrf52"
+    "${nrf5_sdk}/external/freertos/portable/CMSIS/nrf52"
     "${AFR_3RDPARTY_DIR}/tinycrypt/lib/include"
     "${AFR_3RDPARTY_DIR}/jsmn"
     "${AFR_3RDPARTY_DIR}/pkcs11"
-    "${AFR_MODULES_ABSTRACTIONS_DIR}/pkcs11/include"
+    "${AFR_MODULES_ABSTRACTIONS_DIR}/pkcs11/corePKCS11/source/include"
     ${nrf5_sdk_include}
     "$<IF:${AFR_IS_TESTING},${AFR_TESTS_DIR},${AFR_DEMOS_DIR}>/include"
 )
@@ -450,7 +452,7 @@ target_link_libraries(
     INTERFACE AFR::freertos_plus_posix
 )
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS demos and tests
+# FreeRTOS demos and tests
 # -------------------------------------------------------------------------------------------------
 set(CMAKE_EXECUTABLE_SUFFIX ".hex")
 
@@ -482,14 +484,9 @@ if(AFR_ENABLE_DEMOS OR AFR_ENABLE_TESTS)
        ${exe_target}
        PRIVATE
        "${nrf5_sdk}/external/nrf_cc310/lib/libnrf_cc310_0.9.10.a"
-       "${AFR_COMPILER_DIR}/../../../lib/libc_v7em_fpv5_d16_hard_t_le_eabi.a"
-       "${AFR_COMPILER_DIR}/../../../lib/libdebugio_mempoll_v7em_fpv4_sp_d16_hard_t_le_eabi.a"
        "${AFR_COMPILER_DIR}/../../../lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a"
        "${AFR_COMPILER_DIR}/../../../lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a"
-       "${AFR_COMPILER_DIR}/../../../lib/libcpp_v7em_fpv4_sp_d16_hard_t_le_eabi.a"
        "${AFR_COMPILER_DIR}/../../../lib/libdebugio_v7em_fpv4_sp_d16_hard_t_le_eabi.a"
-       "${AFR_COMPILER_DIR}/../../../lib/libvfprintf_v7em_fpv4_sp_d16_hard_t_le_eabi.o"
-       "${AFR_COMPILER_DIR}/../../../lib/libvfscanf_v7em_fpv4_sp_d16_hard_t_le_eabi.o"
     )
 
     if(AFR_METADATA_MODE)
@@ -523,6 +520,7 @@ if(AFR_ENABLE_DEMOS OR AFR_ENABLE_TESTS)
     function(nrf52840_build)
         set( build_target ${ARGV0} )
         set( build_mkld_flags ${${ARGV1}} )
+
         add_custom_command(
             TARGET ${build_target}
             PRE_LINK

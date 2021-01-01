@@ -1,5 +1,6 @@
 set(mchp_dir "${AFR_VENDORS_DIR}/microchip")
 set(ecc608a_dir "${mchp_dir}/secure_elements")
+set(ECC608_IN_USE TRUE)
 
 set(afr_ports_dir "${CMAKE_CURRENT_LIST_DIR}/ports")
 set(board_demos_dir "${CMAKE_CURRENT_LIST_DIR}/aws_demos")
@@ -12,7 +13,7 @@ else()
 endif()
 
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS Console metadata
+# FreeRTOS Console metadata
 # -------------------------------------------------------------------------------------------------
 if("${AFR_BOARD_NAME}" STREQUAL "ecc608a_plus_winsim")
     include("${CMAKE_CURRENT_LIST_DIR}/ecc608a_plus_winsim.cmake")
@@ -37,52 +38,18 @@ target_compile_options(
 )
 
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS portable layers
+# FreeRTOS portable layers
 # -------------------------------------------------------------------------------------------------
 # Normally the portable layer for kernel should be vendor's driver code.
 afr_mcu_port(kernel)
 
-# ECC608A source files
-afr_glob_src(ecc608a_src DIRECTORY ${ecc608a_dir}/lib)
-# vendors/microchip/secure_elements/lib/atca_cfgs.c should not be included in the project because
-# cfg_ateccx08a_kithid_default is re-declared in:
-# vendors/microchip/boards/ecc608a_plus_winsim/ports/pkcs11/iot_pkcs11_secure_element.c
-list(REMOVE_ITEM ecc608a_src "${ecc608a_dir}/lib/atca_cfgs.c")
-afr_glob_src(ecc608a_atacert_src RECURSE DIRECTORY ${ecc608a_dir}/lib/atcacert)
-afr_glob_src(ecc608a_basic_src RECURSE DIRECTORY ${ecc608a_dir}/lib/basic)
-afr_glob_src(ecc608a_crypto_src RECURSE DIRECTORY ${ecc608a_dir}/lib/crypto)
-afr_glob_src(ecc608a_host_src RECURSE DIRECTORY ${ecc608a_dir}/lib/host)
-afr_glob_src(ecc608a_pkcs11_src RECURSE DIRECTORY ${ecc608a_dir}/lib/pkcs11)
 
-set(
-    ecc608a_hid_src
-    "${ecc608a_dir}/third_party/hidapi/windows/hid.c"
-)
-set(
-    ecc608a_hal_src
-        "${ecc608a_dir}/lib/hal/atca_hal.c"
-        "${ecc608a_dir}/lib/hal/hal_all_platforms_kit_hidapi.c"
-        "${ecc608a_dir}/lib/hal/hal_freertos.c"
-        "${ecc608a_dir}/lib/hal/hal_windows.c"
-        "${ecc608a_dir}/lib/hal/kit_protocol.c"
-        "${ecc608a_dir}/lib/hal/atca_hal.h"
-        "${ecc608a_dir}/lib/hal/hal_all_platforms_kit_hidapi.h"
-        "${ecc608a_dir}/lib/hal/kit_phy.h"
-        "${ecc608a_dir}/lib/hal/kit_protocol.h"
-)
 target_sources(
     AFR::kernel::mcu_port
     INTERFACE
         "${AFR_KERNEL_DIR}/portable/MSVC-MingW/port.c"
         "${AFR_KERNEL_DIR}/portable/MSVC-MingW/portmacro.h"
         "${AFR_KERNEL_DIR}/portable/MemMang/heap_4.c"
-        "${ecc608a_src}"
-        "${ecc608a_atacert_src}"
-        "${ecc608a_basic_src}"
-        "${ecc608a_crypto_src}"
-        "${ecc608a_hal_src}"
-        "${ecc608a_hid_src}"
-        "${ecc608a_host_src}"
 )
 target_include_directories(
     AFR::kernel::mcu_port
@@ -117,12 +84,28 @@ target_link_libraries(
 )
 
 # PKCS11
-afr_mcu_port(pkcs11_implementation)
+afr_mcu_port(pkcs11_implementation DEPENDS AFR::pkcs11_ecc608a)
+set(
+    ecc608a_hid_src
+    "${ecc608a_dir}/third_party/hidapi/windows/hid.c"
+)
+set(
+    ecc608a_hal_src
+        "${ecc608a_dir}/lib/hal/atca_hal.c"
+        "${ecc608a_dir}/lib/hal/hal_all_platforms_kit_hidapi.c"
+        "${ecc608a_dir}/lib/hal/hal_freertos.c"
+        "${ecc608a_dir}/lib/hal/hal_windows.c"
+        "${ecc608a_dir}/lib/hal/kit_protocol.c"
+        "${ecc608a_dir}/lib/hal/atca_hal.h"
+        "${ecc608a_dir}/lib/hal/hal_all_platforms_kit_hidapi.h"
+        "${ecc608a_dir}/lib/hal/kit_phy.h"
+        "${ecc608a_dir}/lib/hal/kit_protocol.h"
+)
 target_sources(
     AFR::pkcs11_implementation::mcu_port
     INTERFACE
-        "${ecc608a_pkcs11_src}"
-        "${afr_ports_dir}/pkcs11/iot_pkcs11_secure_element.c"
+        "${ecc608a_hal_src}"
+        "${ecc608a_hid_src}"
 )
 
 # FreeRTOS Plus TCP
@@ -130,13 +113,17 @@ afr_mcu_port(freertos_plus_tcp)
 target_sources(
     AFR::freertos_plus_tcp::mcu_port
     INTERFACE
-        "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/source/portable/BufferManagement/BufferAllocation_2.c"
-        "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/source/portable/NetworkInterface/WinPCap/NetworkInterface.c"
+        "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/portable/BufferManagement/BufferAllocation_2.c"
+        "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/portable/NetworkInterface/WinPCap/NetworkInterface.c"
+        # Header files added to the target so that these are available in code downloaded from the FreeRTOS console.
+        "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/portable/Compiler/MSVC/pack_struct_end.h"
+        "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/portable/Compiler/MSVC/pack_struct_start.h"
 )
+
 target_include_directories(
     AFR::freertos_plus_tcp::mcu_port
     INTERFACE
-        "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/source/portable/Compiler/MSVC"
+        "${AFR_MODULES_FREERTOS_PLUS_DIR}/standard/freertos_plus_tcp/portable/Compiler/MSVC"
 )
 target_link_libraries(
     AFR::freertos_plus_tcp::mcu_port
@@ -165,7 +152,7 @@ target_link_libraries(
 )
 
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS demos and tests
+# FreeRTOS demos and tests
 # -------------------------------------------------------------------------------------------------
 # TODO, remove network manager src.
 afr_glob_src(network_manager_src DIRECTORY "${AFR_DEMOS_DIR}/network_manager")
@@ -187,7 +174,6 @@ endif()
 add_executable(
     ${exe_target}
     "${board_dir}/application_code/main.c"
-    "${board_demos_dir}/application_code/atca_cert_chain.c"
     "${board_demos_dir}/application_code/aws_demo_logging.c"
     "${board_demos_dir}/application_code/aws_entropy_hardware_poll.c"
     "${board_demos_dir}/application_code/aws_run-time-stats-utils.c"

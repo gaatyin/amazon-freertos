@@ -1,26 +1,28 @@
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS modules
+# FreeRTOS modules
 # -------------------------------------------------------------------------------------------------
 # First we need to clean defined CACHE variables on previous CMake run.
 foreach(module IN LISTS AFR_MODULES)
     foreach(prop IN ITEMS SOURCES INCLUDES DEPENDS)
+        unset(AFR_MODULE_${module}_CMAKE_FILES CACHE)
         unset(AFR_MODULE_${module}_${prop}_PRIVATE CACHE)
         unset(AFR_MODULE_${module}_${prop}_PUBLIC CACHE)
         unset(AFR_MODULE_${module}_${prop}_INTERFACE CACHE)
         unset(AFR_MODULE_${module}_${prop}_ALL CACHE)
     endforeach()
 endforeach()
+unset(AFR_FILES_TO_CONSOLE_METADATA CACHE)
 
 # Global variables.
-set(AFR_MODULES                 "" CACHE INTERNAL "List of Amazon FreeRTOS modules.")
+set(AFR_MODULES                 "" CACHE INTERNAL "List of FreeRTOS modules.")
 set(AFR_MODULES_PORT            "" CACHE INTERNAL "List of porting layer targets defined from vendors.")
-set(AFR_MODULES_PUBLIC          "" CACHE INTERNAL "List of public Amazon FreeRTOS modules.")
-set(AFR_MODULES_BUILD           "" CACHE INTERNAL "List of Amazon FreeRTOS modules to build.")
-set(AFR_MODULES_ENABLED         "" CACHE INTERNAL "List of enabled Amazon FreeRTOS modules.")
-set(AFR_MODULES_ENABLED_USER    "" CACHE INTERNAL "List of Amazon FreeRTOS modules enabled by user.")
-set(AFR_MODULES_ENABLED_DEPS    "" CACHE INTERNAL "List of Amazon FreeRTOS modules enabled due to dependencies.")
-set(AFR_DEMOS_ENABLED           "" CACHE INTERNAL "List of supported demos for Amazon FreeRTOS.")
-set(AFR_TESTS_ENABLED           "" CACHE INTERNAL "List of supported tests for Amazon FreeRTOS.")
+set(AFR_MODULES_PUBLIC          "" CACHE INTERNAL "List of public FreeRTOS modules.")
+set(AFR_MODULES_BUILD           "" CACHE INTERNAL "List of FreeRTOS modules to build.")
+set(AFR_MODULES_ENABLED         "" CACHE INTERNAL "List of enabled FreeRTOS modules.")
+set(AFR_MODULES_ENABLED_USER    "" CACHE INTERNAL "List of FreeRTOS modules enabled by user.")
+set(AFR_MODULES_ENABLED_DEPS    "" CACHE INTERNAL "List of FreeRTOS modules enabled due to dependencies.")
+set(AFR_DEMOS_ENABLED           "" CACHE INTERNAL "List of supported demos for FreeRTOS.")
+set(AFR_TESTS_ENABLED           "" CACHE INTERNAL "List of supported tests for FreeRTOS.")
 set(3RDPARTY_MODULES_ENABLED    "" CACHE INTERNAL "List of 3rdparty libraries enabled due to dependencies.")
 
 # Global setting for whether enable all modules by default or not.
@@ -28,7 +30,7 @@ if(NOT AFR_ENABLE_ALL_MODULES)
     set(AFR_ENABLE_ALL_MODULES 1 CACHE INTERNAL "")
 endif()
 
-# Define an Amazon FreeRTOS module, the module name will be added to the global variable AFR_MODULES.
+# Define an FreeRTOS module, the module name will be added to the global variable AFR_MODULES.
 # Use NAME to provide a name for the module, if not use, the name will be inferred from the folder name.
 # Use INTERNAL to indicate the module is for internal use and will only be enabled if it's required by a public module.
 # Use INTERFACE to define the module as an INTERFACE target instead of a static library, implies INTERNAL.
@@ -60,7 +62,6 @@ function(afr_module)
         afr_cache_append(AFR_MODULES_PUBLIC ${module_name})
     endif()
 
-    # All modules implicitly depends on kernel unless INTERFACE or KERNEL is provided.
     if(NOT (ARG_INTERFACE OR ARG_KERNEL))
         afr_module_dependencies(
             ${module_name}
@@ -185,6 +186,19 @@ endfunction()
 # Specify dependencies of a module.
 function(afr_module_dependencies arg_module)
     __afr_module_prop(${arg_module} DEPENDS ${ARGN})
+endfunction()
+
+# Function to add module-specific CMake files to metadata.
+# This function should be used to add cmake files when:
+# 1. The module name does not match its parent folder name
+#                 OR/AND
+# 2. A non-CMakeLists.txt (like "core_json.cmake") file needs to be added to metadata.
+# Thif function sets the AFR_MODULE_${module_name}_CMAKE_FILES cache
+# variable.
+function(afr_module_cmake_files module_name)
+    set(prop_var AFR_MODULE_${module_name}_CMAKE_FILES)
+    set(${prop_var} "" CACHE INTERNAL "")
+    afr_cache_append(${prop_var} ${ARGN})
 endfunction()
 
 # -------------------------------------------------------------------------------------------------
@@ -335,7 +349,11 @@ function(afr_resolve_dependencies)
     # If neither demos nor tests are enabled, then don't search the aws_demos/aws_tests targets.
     if(AFR_ENABLE_DEMOS OR AFR_ENABLE_TESTS)
         __search_afr_dependencies(${exe_target} dependencies)
-        afr_module_dependencies(${exe_base} INTERFACE ${dependencies})
+	afr_module_dependencies(${exe_base} INTERFACE ${dependencies})
+    endif()
+
+    if (AFR_ENABLE_UNIT_TESTS)
+	return()
     endif()
 
     # Make sure kernel can be enabled first.
@@ -393,7 +411,7 @@ function(afr_resolve_dependencies)
     # Disable all other modules that are not required.
     set(__dg_disabled "" CACHE INTERNAL "")
     foreach(module IN LISTS AFR_MODULES)
-        string(REGEX MATCH "(demo_|test_)" match "${module}")
+        string(REGEX MATCH "^(demo_|test_)" match "${module}")
         if("${match}" STREQUAL "" AND NOT ${module} IN_LIST AFR_MODULES_ENABLED)
             afr_cache_append(__dg_disabled ${module})
         endif()
@@ -401,7 +419,7 @@ function(afr_resolve_dependencies)
 
     # Enable available demos/tests.
     foreach(module IN LISTS AFR_MODULES)
-        string(REGEX MATCH "(demo_|test_)" match "${module}")
+        string(REGEX MATCH "^(demo_|test_)" match "${module}")
         if(NOT "${match}" STREQUAL "")
             __resolve_dependencies(${module} QUIET)
             if(NOT ${module} IN_LIST __dg_disabled)
@@ -481,7 +499,7 @@ endfunction()
 # -------------------------------------------------------------------------------------------------
 # Interface for MCU vendors
 # -------------------------------------------------------------------------------------------------
-# Define an INTERFACE IMPORTED target for the portable layer of an Amazon FreeRTOS module, the
+# Define an INTERFACE IMPORTED target for the portable layer of an FreeRTOS module, the
 # target name is added to the global variables AFR_MODULES and AFR_MODULES_PORT. Additional
 # dependencies can be provided with DEPENDS parameter, or you can also use the target name
 # AFR::${arg_module}::mcu_port directly with any CMake built-in functions.

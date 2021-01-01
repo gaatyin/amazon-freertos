@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS V1.4.7
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS V1.4.7
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -41,8 +41,8 @@
 
 #include "iot_default_root_certificates.h"
 #include "aws_secure_sockets_config.h"
-#include "iot_pkcs11.h"
-#include "iot_pkcs11_config.h"
+#include "core_pkcs11.h"
+#include "core_pkcs11_config.h"
 
 /* Demo priorities & stack sizes. */
 #include "aws_demo_config.h"

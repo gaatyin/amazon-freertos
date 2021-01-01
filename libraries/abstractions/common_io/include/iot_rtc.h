@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS Common IO V0.1.0
- * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Common IO V0.1.3
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -169,6 +169,7 @@ void iot_rtc_set_callback( IotRtcHandle_t const pxRtcHandle,
  *      - xRequest is invalid
  *      - pvBuffer == NULL (excluding eCancelRtcAlarm, eCancelRtcWakeup)
  *      - if date/time is set in the past for eSetRtcAlarm
+ *   - IOT_RTC_SET_FAILED if date/time is invalid for eSetRtcAlarm.
  *   - IOT_RTC_NOT_STARTED on error
  *   - IOT_RTC_FUNCTION_NOT_SUPPORTED if feature not supported
  *      - Only valid for eCancelRtcAlarm, eCancelRtcWakeup

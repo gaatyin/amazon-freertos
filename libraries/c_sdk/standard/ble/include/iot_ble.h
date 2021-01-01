@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS BLE V2.0.0
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS BLE V2.2.0
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -431,8 +431,8 @@ typedef union
 
 /**
  * @cond DOXYGEN_IGNORE
- * @brief that implementation of this function need to be given when IOT_BLE_ADD_CUSTOM_SERVICES is true
- * and when the user needs to add his own services
+ * @brief The implementation of this function needs to be given when IOT_BLE_ADD_CUSTOM_SERVICES is set to
+ * 1 and when the user needs to add their own services.
  */
     void IotBle_AddCustomServicesCb( void );
 /** @endcond */
@@ -442,8 +442,8 @@ typedef union
 
 /**
  * @cond DOXYGEN_IGNORE
- * @brief the implementation of this function need to be given when IOT_BLE_SET_CUSTOM_ADVERTISEMENT_MSG is true
- * and when the user needs to set his own advertisement/scan response message
+ * @brief The implementation of this function needs to be given when IOT_BLE_SET_CUSTOM_ADVERTISEMENT_MSG is
+ * set to 1 and when the user needs to set their own advertisement/scan response message.
  *
  * @param[out] pAdvParams: Advertisment structure. Needs to be filled by the user.
  *  @param[out] pScanParams: Scan response structure. Needs to be filled by the user.
@@ -641,5 +641,23 @@ BTStatus_t IotBle_GetConnectionInfo( uint16_t connId,
 BTStatus_t IotBle_ConfirmNumericComparisonKeys( BTBdaddr_t * pBdAddr,
                                                 bool keyAccepted );
 /* @[declare_iotble_confirmnumericcomparisonkeys] */
+
+
+/**
+ * @brief Set device name for BLE.
+ *
+ * API can be used to set the device name before turning on BLE by calling IotBle_On(),
+ * or when BLE is running. When BLE is advertising mode, setting device name should take into effect
+ * immediately for the current advertisement. The device name needs to be set only once and
+ * is available across BLE turn off-turn on cycles. API should be called only after IotBle_Init().
+ *
+ * @param[in] pName Pointer to the device name string.
+ * @param[in] length Length of the device name string without null terminator.
+ * @return Returns eBTStatusSuccess on successful call or error code otherwise.
+ */
+/* @[declare_iotble_setdevicename] */
+BTStatus_t IotBle_SetDeviceName( const char * pName,
+                                 size_t length );
+/* @[declare_iotble_setdevicename] */
 
 #endif /* _AWS_BLE_H_*/

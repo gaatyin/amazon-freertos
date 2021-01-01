@@ -65,7 +65,10 @@ extern void vLoggingPrintf( const char * pcFormatString,
  * then set ipconfigDRIVER_INCLUDED_RX_IP_CHECKSUM to 1 to prevent the software
  * stack repeating the checksum calculations. */
 #define ipconfigDRIVER_INCLUDED_TX_IP_CHECKSUM		( 1 )
-#define ipconfigDRIVER_INCLUDED_RX_IP_CHECKSUM     1
+#define ipconfigDRIVER_INCLUDED_RX_IP_CHECKSUM		( 1 )
+
+#define ipconfigZERO_COPY_RX_DRIVER					( 1 )
+#define ipconfigZERO_COPY_TX_DRIVER					( 1 )
 
 /* Several API's will block until the result is known, or the action has been
  * performed, for example FreeRTOS_send() and FreeRTOS_recv().  The timeouts can be
@@ -86,8 +89,10 @@ extern void vLoggingPrintf( const char * pcFormatString,
  * and also DNS may use small timeouts.  If a DNS reply comes in after the DNS
  * socket has been destroyed, the result will be stored into the cache.  The next
  * call to FreeRTOS_gethostbyname() will return immediately, without even creating
- * a socket. */
+ * a socket.
+ */
 #define ipconfigUSE_DNS_CACHE                      ( 1 )
+#define ipconfigDNS_CACHE_ADDRESSES_PER_ENTRY      ( 6 )
 #define ipconfigDNS_CACHE_NAME_LENGTH              ( 254 )
 #define ipconfigDNS_CACHE_ENTRIES                  ( 4 )
 #define ipconfigDNS_REQUEST_ATTEMPTS               ( 2 )
@@ -204,7 +209,7 @@ extern uint32_t uxRand();
  * are available to the IP stack.  The total number of network buffers is limited
  * to ensure the total amount of RAM that can be consumed by the IP stack is capped
  * to a pre-determinable value. */
-#define ipconfigNUM_NETWORK_BUFFER_DESCRIPTORS    96
+#define ipconfigNUM_NETWORK_BUFFER_DESCRIPTORS    96U
 
 #define ipconfigUSE_LINKED_RX_MESSAGES	1
 
@@ -245,7 +250,7 @@ extern uint32_t uxRand();
  * lower value can save RAM, depending on the buffer management scheme used.  If
  * ipconfigCAN_FRAGMENT_OUTGOING_PACKETS is 1 then (ipconfigNETWORK_MTU - 28) must
  * be divisible by 8. */
-#define ipconfigNETWORK_MTU                            1500
+#define ipconfigNETWORK_MTU                            1500U
 
 /* Set ipconfigUSE_DNS to 1 to include a basic DNS client/resolver.  DNS is used
  * through the FreeRTOS_gethostbyname() API function. */
@@ -286,7 +291,7 @@ extern uint32_t uxRand();
  * 32-bit memory instructions, all packets will be stored 32-bit-aligned,
  * plus 16-bits. This has to do with the contents of the IP-packets: all
  * 32-bit fields are 32-bit-aligned, plus 16-bit. */
-#define ipconfigPACKET_FILLER_SIZE                     2
+#define ipconfigPACKET_FILLER_SIZE                     2U
 
 /* Define the size of the pool of TCP window descriptors.  On the average, each
  * TCP socket will use up to 2 x 6 descriptors, meaning that it can have 2 x 6

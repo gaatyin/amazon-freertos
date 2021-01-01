@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS POSIX V1.1.2
- * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS POSIX V1.2.0
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -243,7 +243,7 @@ int pthread_barrier_wait( pthread_barrier_t * barrier );
  */
 int pthread_create( pthread_t * thread,
                     const pthread_attr_t * attr,
-                    void *( *startroutine )( void * ),
+                    void * ( *startroutine )( void * ),
                     void * arg );
 
 /**

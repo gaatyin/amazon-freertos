@@ -1,12 +1,5 @@
 afr_module()
 
-afr_set_lib_metadata(ID "defender")
-afr_set_lib_metadata(DESCRIPTION "This library enables metrics reporting with AWS IoT Device Defender.")
-afr_set_lib_metadata(DISPLAY_NAME "Device Defender")
-afr_set_lib_metadata(CATEGORY "Amazon Services")
-afr_set_lib_metadata(VERSION "1.0.0")
-afr_set_lib_metadata(IS_VISIBLE "true")
-
 set(src_dir "${CMAKE_CURRENT_LIST_DIR}/src")
 set(inc_dir "${CMAKE_CURRENT_LIST_DIR}/include")
 set(test_dir "${CMAKE_CURRENT_LIST_DIR}/test")
@@ -26,6 +19,7 @@ afr_module_include_dirs(
     ${AFR_CURRENT_MODULE}
     PUBLIC
         "${inc_dir}"
+        "$<${AFR_IS_TESTING}:${src_dir}>"
 )
 
 afr_module_dependencies(
@@ -40,12 +34,8 @@ afr_test_module()
 afr_module_sources(
     ${AFR_CURRENT_MODULE}
     INTERFACE
-        "${test_dir}/aws_iot_tests_defender_api.c"
-)
-afr_module_include_dirs(
-    ${AFR_CURRENT_MODULE}
-    INTERFACE
-        "${src_dir}/private"
+        "${test_dir}/unit/aws_iot_tests_defender_unit.c"
+        "${test_dir}/system/aws_iot_tests_defender_system.c"
 )
 afr_module_dependencies(
     ${AFR_CURRENT_MODULE}

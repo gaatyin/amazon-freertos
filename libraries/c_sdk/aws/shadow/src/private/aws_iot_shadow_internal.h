@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS Shadow V2.1.0
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Shadow V2.2.3
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -388,7 +388,7 @@ typedef struct _shadowOperation
              *
              * Only used when the flag #AWS_IOT_SHADOW_FLAG_WAITABLE is set.
              */
-            void *( *mallocDocument )( size_t );
+            void * ( *mallocDocument )( size_t );
 
             const char * pDocument; /**< @brief Retrieved Shadow document. */
             size_t documentLength;  /**< @brief Length of retrieved Shadow document. */

@@ -1,6 +1,6 @@
 /*
- * Amazon FreeRTOS V1.4.4
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS V1.4.4
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -58,10 +58,10 @@
 /* extern void vAssertCalled( const char *pcFile, uint32_t ulLine ); */
 /* #define mqttconfigASSERT( x ) if( ( x ) == 0 ) vAssertCalled( __FILE__, __LINE__ ) */
 
-#if defined(AMAZON_FREERTOS_ENABLE_UNIT_TESTS)
+#if defined(FREERTOS_ENABLE_UNIT_TESTS)
 #include "unity_internals.h"
 #define mqttconfigASSERT( x )  if( ( x ) == 0 ) TEST_ABORT()
-#endif /* AMAZON_FREERTOS_ENABLE_UNIT_TESTS */
+#endif /* FREERTOS_ENABLE_UNIT_TESTS */
 
 /**
  * @brief Set this macro to 1 for enabling debug logs.

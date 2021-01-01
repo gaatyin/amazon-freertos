@@ -17,7 +17,7 @@ if(NOT ${AFR_TOOLCHAIN} STREQUAL "arm-gcc")
 endif()
 
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS Console metadata
+# FreeRTOS Console metadata
 # -------------------------------------------------------------------------------------------------
 
 afr_set_board_metadata(ID "Infineon-XMC4800-IoT-Connectivity-Kit")
@@ -138,7 +138,7 @@ target_link_libraries(
 )
 
 # -------------------------------------------------------------------------------------------------
-# Kernel and Amazon FreeRTOS portable layers
+# Kernel and FreeRTOS portable layers
 # -------------------------------------------------------------------------------------------------
 
 # Kernel
@@ -181,6 +181,7 @@ set(kernel_includes
     "${AFR_KERNEL_DIR}/include"
     "$<IF:${AFR_IS_TESTING},${AFR_TESTS_DIR},${AFR_DEMOS_DIR}>/include"
     "${AFR_3RDPARTY_DIR}/mbedtls/include"
+    "${AFR_3RDPARTY_DIR}/mbedtls_utils"
     "${xmc4800_aws_dir}/config_files"
 )
 
@@ -219,7 +220,7 @@ afr_mcu_port(pkcs11_implementation DEPENDS AFR::pkcs11_mbedtls)
 target_sources(
     AFR::pkcs11_implementation::mcu_port
     INTERFACE
-        "${xmc4800_ports_dir}/pkcs11/iot_pkcs11_pal.c"
+        "${xmc4800_ports_dir}/pkcs11/core_pkcs11_pal.c"
 )
 
 # Secure sockets
@@ -238,7 +239,7 @@ target_sources(
 )
 
 # -------------------------------------------------------------------------------------------------
-# Amazon FreeRTOS demos and tests
+# FreeRTOS demos and tests
 # -------------------------------------------------------------------------------------------------
 set(CMAKE_EXECUTABLE_SUFFIX ".elf")
 
